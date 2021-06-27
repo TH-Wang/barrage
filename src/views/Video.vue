@@ -66,7 +66,7 @@ export default defineComponent({
 .container {
   width: 500px;
   height: 300px;
-  background-color: gray;
+  background-color: #000;
   position: relative;
 }
 .controller {

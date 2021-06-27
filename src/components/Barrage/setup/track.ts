@@ -1,5 +1,5 @@
 import { onBeforeMount, Ref, ref, ToRefs, toRefs, watch } from "vue";
-import { Text, Tracks } from "../barrage";
+import { Text, Tracks } from "../types";
 import sheduler, { pushQueue } from "../sheduler";
 
 interface TrackSetup {

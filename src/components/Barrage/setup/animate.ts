@@ -1,5 +1,5 @@
 import { Ref } from "vue";
-import { Bullet } from "../barrage";
+import { Bullet } from "../types";
 
 type InvokeAnimate = (e: Element, moveX: number, duration: number) => Animation;
 

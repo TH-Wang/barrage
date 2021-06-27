@@ -1,4 +1,4 @@
-import { Bullet, Tracks } from "./barrage";
+import { Bullet, Tracks } from "./types";
 
 // 缓冲队列
 const queue: Array<Bullet> = [];
