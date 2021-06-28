@@ -10,7 +10,7 @@
         v-for="bullet in track"
         :key="bullet.data.id"
         class="text"
-        v-load="{ listenr: textElementLoad, payload: bullet }"
+        v-load="{ listener: elementLoad, payload: bullet }"
       >
         {{ bullet.data.value }}
       </div>
@@ -20,11 +20,11 @@
 
 <script lang="ts">
 import { defineComponent, nextTick, onMounted, PropType, toRefs } from "vue";
-import sizes from "./setup/useSizes";
-import track from "./setup/useTracks";
+import useSizes from "./setup/useSizes";
+import useTracks from "./setup/useTracks";
 import animate from "./core/animate";
 import { pushQueue } from "./core/sheduler";
-import { Text, FontSizePropType, AreaPropType, AREA } from "./types";
+import { Text, Bullet, FontSizePropType, AreaPropType, AREA } from "./types";
 
 export default defineComponent({
   props: {
@@ -48,7 +48,7 @@ export default defineComponent({
   directives: {
     load: {
       mounted(e, { value }) {
-        nextTick(value.listenr(e, value.payload));
+        nextTick(value.listener(e, value.payload));
       },
     },
   },
@@ -56,11 +56,13 @@ export default defineComponent({
     const { fontSize, area } = toRefs(props);
 
     const { containerSize, containerRef, rows, trackViewHeight, getSizes } =
-      sizes(fontSize, area);
+      useSizes(fontSize, area);
 
-    const { textElementLoad } = animate(containerSize);
+    const { tracks } = useTracks(rows);
 
-    const { tracks } = track(rows);
+    const elementLoad = (el: Element, bullet: Bullet) => {
+      animate(el, bullet);
+    };
 
     const add = (text: Text) => {
       pushQueue({ data: text, animate: null });
@@ -71,11 +73,16 @@ export default defineComponent({
     });
 
     return {
+      // refs
       containerSize,
       containerRef,
-      trackViewHeight,
-      textElementLoad,
       tracks,
+
+      // computed
+      trackViewHeight,
+
+      // methods
+      elementLoad,
 
       // exposed apis
       add,
