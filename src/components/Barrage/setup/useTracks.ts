@@ -1,11 +1,7 @@
-import { onBeforeMount, Ref, ref, watch } from "vue";
-import { Text, Tracks } from "../types";
-import sheduler, { pushQueue } from "../sheduler";
+import { Ref, ref, watch } from "vue";
+import { Tracks } from "../types";
 
-interface TrackSetup {
-  tracks: Ref<Tracks>;
-  add: (text: Text) => void;
-}
+type UseTracks = (rows: Ref<number>) => { tracks: Ref<Tracks> };
 
 // 初始化轨道数据格式
 const initTracks = (count: number): Tracks => {
@@ -27,13 +23,9 @@ const watchRowsChange = (val: number, tracks: Tracks) => {
   }
 };
 
-export default function tracks(rows: Ref<number>): TrackSetup {
+const useTracks: UseTracks = (rows) => {
   const initTrack: Tracks = initTracks(rows.value);
   const tracks = ref<Tracks>(initTrack);
-
-  onBeforeMount(() => {
-    sheduler(tracks.value, rows.value);
-  });
 
   watch(
     rows,
@@ -45,10 +37,7 @@ export default function tracks(rows: Ref<number>): TrackSetup {
     }
   );
 
-  const add = (text: Text) => {
-    // 将 bullet 推入到缓冲队列
-    pushQueue({ data: text, animate: null });
-  };
+  return { tracks };
+};
 
-  return { tracks, add };
-}
+export default useTracks;

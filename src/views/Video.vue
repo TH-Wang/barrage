@@ -25,6 +25,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import Barrage from "@/components/Barrage/index.vue";
+import { Text } from "@/components/Barrage/types";
 
 let uid = 0;
 
@@ -38,7 +39,7 @@ export default defineComponent({
     const inputRef = ref();
 
     const send = () => {
-      const randomData = {
+      const randomData: Text = {
         id: uid++,
         value: inputRef.value.value,
       };

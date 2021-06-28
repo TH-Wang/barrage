@@ -19,12 +19,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, PropType, toRefs } from "vue";
-import getContainerSize from "./setup/getContainerSize";
-import stylesAndSizes from "./setup/stylesAndSizes";
-import track from "./setup/track";
-import animate from "./setup/animate";
-import { FontSizePropType, AreaPropType, AREA } from "./types";
+import { defineComponent, nextTick, onMounted, PropType, toRefs } from "vue";
+import sizes from "./setup/useSizes";
+import track from "./setup/useTracks";
+import animate from "./core/animate";
+import { pushQueue } from "./core/sheduler";
+import { Text, FontSizePropType, AreaPropType, AREA } from "./types";
 
 export default defineComponent({
   props: {
@@ -55,14 +55,20 @@ export default defineComponent({
   setup(props) {
     const { fontSize, area } = toRefs(props);
 
-    const { containerSize, containerRef } = getContainerSize();
-    const { rows, trackViewHeight } = stylesAndSizes(
-      fontSize,
-      area,
-      containerSize
-    );
+    const { containerSize, containerRef, rows, trackViewHeight, getSizes } =
+      sizes(fontSize, area);
+
     const { textElementLoad } = animate(containerSize);
-    const { tracks, add } = track(rows);
+
+    const { tracks } = track(rows);
+
+    const add = (text: Text) => {
+      pushQueue({ data: text, animate: null });
+    };
+
+    onMounted(() => {
+      getSizes();
+    });
 
     return {
       containerSize,
@@ -70,6 +76,8 @@ export default defineComponent({
       trackViewHeight,
       textElementLoad,
       tracks,
+
+      // exposed apis
       add,
     };
   },
