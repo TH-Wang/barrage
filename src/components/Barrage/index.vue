@@ -2,7 +2,7 @@
   <div class="text-view" ref="containerRef">
     <div
       class="track"
-      :style="{ height: trackViewHeight }"
+      :style="{ height: trackViewHeight + 'px' }"
       v-for="(track, idx) in tracks"
       :key="idx"
     >
@@ -23,8 +23,15 @@ import { defineComponent, nextTick, onMounted, PropType, toRefs } from "vue";
 import useSizes from "./setup/useSizes";
 import useTracks from "./setup/useTracks";
 import animate from "./core/animate";
-import { pushQueue } from "./core/sheduler";
-import { Text, Bullet, FontSizePropType, AreaPropType, AREA } from "./types";
+import sheduler, { pushQueue } from "./core/sheduler";
+import {
+  Text,
+  Bullet,
+  FontSizePropType,
+  AreaPropType,
+  AREA_ENUM,
+  TrackHandlers,
+} from "./types";
 
 export default defineComponent({
   props: {
@@ -35,7 +42,7 @@ export default defineComponent({
     },
     area: {
       type: String as PropType<AreaPropType>,
-      default: AREA.SMALL,
+      default: AREA_ENUM.SMALL,
     },
   },
   computed: {
@@ -58,15 +65,20 @@ export default defineComponent({
     const { containerSize, containerRef, rows, trackViewHeight, getSizes } =
       useSizes(fontSize, area);
 
-    const { tracks } = useTracks(rows);
+    const { tracks, initTrackHandlers } = useTracks(rows);
 
     const elementLoad = (el: Element, bullet: Bullet) => {
       animate(el, bullet);
     };
 
-    const add = (text: Text) => {
-      pushQueue({ data: text, animate: null });
+    const add = (text: Text | Text[]) => {
+      if (Array.isArray(text)) {
+        pushQueue(text.map((item) => ({ data: item, animate: null })));
+      } else pushQueue({ data: text, animate: null });
     };
+
+    const { pushTracks, cleanupTracks }: TrackHandlers = initTrackHandlers();
+    sheduler({ pushTracks, cleanupTracks });
 
     onMounted(() => {
       getSizes();

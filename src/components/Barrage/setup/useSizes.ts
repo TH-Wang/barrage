@@ -1,5 +1,11 @@
 import { ref, Ref, reactive, computed, watch, ComputedRef } from "vue";
-import { AreaPropType, FontSizePropType, Size, AREA } from "../types";
+import {
+  AreaPropType,
+  FontSizePropType,
+  Size,
+  AREA_ENUM,
+  RENDER_STATUS_ENUM,
+} from "../types";
 
 type UseSizes = (
   fontSize: Ref<FontSizePropType>,
@@ -18,19 +24,23 @@ type ComputeRows = (
   trackHeight: number
 ) => number;
 
+let render_status = RENDER_STATUS_ENUM.PENDING;
+
+export const getRenderStatus = () => render_status;
+
 // 计算轨道数量
 const computeRows: ComputeRows = (area, containerSize, trackHeight) => {
   const { height } = containerSize;
   const total: number = Math.floor(height / trackHeight);
 
   switch (area) {
-    case AREA.SMALL:
+    case AREA_ENUM.SMALL:
       return Math.round(total / 4);
-    case AREA.HALF:
+    case AREA_ENUM.HALF:
       return Math.round(total / 2);
-    case AREA.MOST:
+    case AREA_ENUM.MOST:
       return Math.round((total / 4) * 3);
-    case AREA.FULL:
+    case AREA_ENUM.FULL:
       return total;
     default:
       return 0;
@@ -60,6 +70,9 @@ const useSizes: UseSizes = (fontSize, area) => {
 
     // 轨道数量
     rows.value = computeRows(area.value, containerSize, trackViewHeight.value);
+
+    // 改变渲染状态 -> done
+    render_status = RENDER_STATUS_ENUM.DONE;
   };
 
   watch(
