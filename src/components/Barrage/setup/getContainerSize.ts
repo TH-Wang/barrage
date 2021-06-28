@@ -1,19 +1,22 @@
-import { ref, onMounted, Ref } from "vue";
+import { ref, onMounted, Ref, reactive } from "vue";
+import { Size } from "../types";
 
 interface GetContainerSize {
   containerRef: Ref<Element>;
-  containerSize: Ref;
+  containerSize: Size;
 }
 
 export default function getContainerSize(): GetContainerSize {
   const containerRef = ref();
-  const containerSize = ref<number>();
+  const containerSize = reactive<Size>({ width: 0, height: 0 });
 
   const getSize = () => {
-    containerSize.value = containerRef.value.getBoundingClientRect().width;
+    containerSize.width = containerRef.value.getBoundingClientRect().width;
+    containerSize.height =
+      containerRef.value.parentNode.getBoundingClientRect().height;
   };
 
   onMounted(getSize);
 
-  return { containerSize, containerRef };
+  return { containerRef, containerSize };
 }

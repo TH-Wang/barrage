@@ -1,5 +1,4 @@
-import { Ref } from "vue";
-import { Bullet } from "../types";
+import { Bullet, Size } from "../types";
 
 type InvokeAnimate = (e: Element, moveX: number, duration: number) => Animation;
 
@@ -28,12 +27,12 @@ interface AnimateReturn {
   textElementLoad: TextElementLoad;
 }
 
-export default function animate(containerSize: Ref<number>): AnimateReturn {
+export default function animate(containerSize: Size): AnimateReturn {
   const textElementLoad: TextElementLoad = (e, bullet) => {
     // 获取文本宽度
     const selfSize: number = e.getBoundingClientRect().width;
     // 计算滚动距离
-    const moveX: number = selfSize + containerSize.value + 10;
+    const moveX: number = selfSize + containerSize.width + 10;
     // 计算全部出现的滑动距离所占比例
     const appeardPercentage: number = selfSize / moveX;
     // 计算滚动的总时间

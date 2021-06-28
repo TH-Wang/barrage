@@ -1,4 +1,4 @@
-import { onBeforeMount, Ref, ref, ToRefs, toRefs, watch } from "vue";
+import { onBeforeMount, Ref, ref, watch } from "vue";
 import { Text, Tracks } from "../types";
 import sheduler, { pushQueue } from "../sheduler";
 
@@ -27,9 +27,7 @@ const watchRowsChange = (val: number, tracks: Tracks) => {
   }
 };
 
-export default function tracks(props: ToRefs): TrackSetup {
-  const { rows } = toRefs(props);
-
+export default function tracks(rows: Ref<number>): TrackSetup {
   const initTrack: Tracks = initTracks(rows.value);
   const tracks = ref<Tracks>(initTrack);
 

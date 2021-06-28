@@ -1,6 +1,11 @@
 <template>
   <div class="text-view" ref="containerRef">
-    <div class="track" v-for="(track, idx) in tracks" :key="idx">
+    <div
+      class="track"
+      :style="{ height: trackViewHeight }"
+      v-for="(track, idx) in tracks"
+      :key="idx"
+    >
       <div
         v-for="bullet in track"
         :key="bullet.data.id"
@@ -14,16 +19,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick } from "vue";
+import { defineComponent, nextTick, PropType, toRefs } from "vue";
 import getContainerSize from "./setup/getContainerSize";
+import stylesAndSizes from "./setup/stylesAndSizes";
 import track from "./setup/track";
 import animate from "./setup/animate";
+import { FontSizePropType, AreaPropType, AREA } from "./types";
 
 export default defineComponent({
   props: {
-    rows: {
-      type: Number,
-      default: 2,
+    // 字体大小
+    fontSize: {
+      type: [String, Number] as PropType<FontSizePropType>,
+      default: 28,
+    },
+    area: {
+      type: String as PropType<AreaPropType>,
+      default: AREA.SMALL,
+    },
+  },
+  computed: {
+    trackHeight(): number | string {
+      const { fontSize } = this.$props;
+      if (typeof fontSize === "number") return fontSize + "px";
+      else return fontSize;
     },
   },
   directives: {
@@ -34,18 +53,24 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const { fontSize, area } = toRefs(props);
+
     const { containerSize, containerRef } = getContainerSize();
+    const { rows, trackViewHeight } = stylesAndSizes(
+      fontSize,
+      area,
+      containerSize
+    );
     const { textElementLoad } = animate(containerSize);
-    const { tracks, add } = track(props);
+    const { tracks, add } = track(rows);
 
     return {
       containerSize,
       containerRef,
-
+      trackViewHeight,
+      textElementLoad,
       tracks,
       add,
-
-      textElementLoad,
     };
   },
 });
@@ -61,7 +86,6 @@ export default defineComponent({
 
   .track {
     width: 100%;
-    height: 36px;
   }
 
   .text {

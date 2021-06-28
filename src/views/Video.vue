@@ -1,14 +1,15 @@
 <template>
   <div class="barrage">
     <div class="container">
-      <barrage :rows="textRows" ref="textViewRef"></barrage>
+      <barrage :area="area" ref="textViewRef"></barrage>
     </div>
     <div class="controller">
-      <span>轨道数量</span>
-      <select v-model="textRows">
-        <option :value="2">2</option>
-        <option :value="4">4</option>
-        <option :value="6">6</option>
+      <span>显示区域</span>
+      <select v-model="area">
+        <option value="small">1/4</option>
+        <option value="half">半屏</option>
+        <option value="most">3/4</option>
+        <option value="full">全屏</option>
       </select>
       <input
         type="text"
@@ -30,7 +31,7 @@ let uid = 0;
 export default defineComponent({
   components: { Barrage },
   data: () => ({
-    textRows: 2,
+    area: "small",
   }),
   setup() {
     const textViewRef = ref<InstanceType<typeof Barrage>>();
