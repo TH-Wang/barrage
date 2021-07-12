@@ -69,7 +69,7 @@ export default defineComponent({
     const { tracks, initTrackHandlers } = useTracks(rows);
 
     const elementLoad = (el: Element, bullet: Bullet) => {
-      animate(el, bullet);
+      animate(el, bullet, containerSize.width);
     };
 
     const add = (text: Text | Text[]) => {
@@ -108,7 +108,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .text-view {
   width: 100%;
-  // overflow: hidden;
+  overflow: hidden;
   position: absolute;
   top: 0;
   left: 0;

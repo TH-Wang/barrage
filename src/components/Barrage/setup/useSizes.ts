@@ -33,18 +33,14 @@ const computeRows: ComputeRows = (area, containerSize, trackHeight) => {
   const { height } = containerSize;
   const total: number = Math.floor(height / trackHeight);
 
-  switch (area) {
-    case AREA_ENUM.SMALL:
-      return Math.round(total / 4);
-    case AREA_ENUM.HALF:
-      return Math.round(total / 2);
-    case AREA_ENUM.MOST:
-      return Math.round((total / 4) * 3);
-    case AREA_ENUM.FULL:
-      return total;
-    default:
-      return 0;
-  }
+  const areaToRows = {
+    [AREA_ENUM.SMALL]: Math.round(total / 4),
+    [AREA_ENUM.HALF]: Math.round(total / 2),
+    [AREA_ENUM.MOST]: Math.round((total / 4) * 3),
+    [AREA_ENUM.FULL]: total,
+  };
+
+  return areaToRows[area] || 0;
 };
 
 const useSizes: UseSizes = (fontSize, area) => {
@@ -55,9 +51,9 @@ const useSizes: UseSizes = (fontSize, area) => {
 
   // 轨道显示高度
   const trackViewHeight = computed((): number => {
-    if (typeof fontSize.value === "number") return fontSize.value;
+    if (typeof fontSize.value === "number") return fontSize.value + 4;
     else if (typeof fontSize.value === "string")
-      return parseInt(fontSize.value.slice(0, -2));
+      return parseInt(fontSize.value.slice(0, -2)) + 4;
     return 0;
   });
 

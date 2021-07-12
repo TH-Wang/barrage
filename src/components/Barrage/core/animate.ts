@@ -7,7 +7,7 @@ type InitParams = (
 
 type InvokeAnimate = (el: Element, s: number, t: number) => Animation;
 
-type Animate = (el: Element, bullet: Bullet) => void;
+type Animate = (el: Element, bullet: Bullet, outerWidth: number) => void;
 
 // 速度(100px/s)
 const SPEED = 100;
@@ -24,6 +24,7 @@ const initParams: InitParams = (el, outerWidth) => {
   // 计算全部出现所需时间
   const appeardTime: number = t * appeardPercentage;
 
+  console.log(`自身长度：${selfWidth}, 容器宽度：${outerWidth}, 总路程：${s}`);
   return { s, t, appeardTime };
 };
 
@@ -44,7 +45,7 @@ const invokeAnimate: InvokeAnimate = (el, s, t) => {
   return el.animate(keyframes, options);
 };
 
-const animate: Animate = (el, bullet) => {
+const animate: Animate = (el, bullet, outerWidth) => {
   const { s, t, appeardTime } = initParams(el, outerWidth);
   // 执行动画，获取动画信息对象
   const animation: Animation = invokeAnimate(el, s, t);
