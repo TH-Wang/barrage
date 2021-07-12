@@ -25,7 +25,7 @@ export interface Size {
 }
 
 export interface Text {
-  id: number;
+  id: string | number;
   value: string | number;
 }
 

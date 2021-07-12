@@ -24,6 +24,7 @@ import useSizes from "./setup/useSizes";
 import useTracks from "./setup/useTracks";
 import animate from "./core/animate";
 import sheduler, { pushQueue } from "./core/sheduler";
+import { getBulltes } from "./model/index";
 import {
   Text,
   Bullet,
@@ -82,6 +83,7 @@ export default defineComponent({
 
     onMounted(() => {
       getSizes();
+      add(getBulltes());
     });
 
     return {

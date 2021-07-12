@@ -5,7 +5,7 @@
     </div>
     <div class="controller">
       <span>显示区域</span>
-      <select v-model="area">
+      <select v-model="area" style="margin-right: 10px">
         <option value="small">1/4</option>
         <option value="half">半屏</option>
         <option value="most">3/4</option>
@@ -19,6 +19,10 @@
       />
       <button @click="send">发送</button>
     </div>
+    <div>
+      <input type="text" v-model="total" />条
+      <button @click="add">发送</button>
+    </div>
   </div>
 </template>
 
@@ -26,17 +30,19 @@
 import { defineComponent, ref } from "vue";
 import Barrage from "@/components/Barrage/index.vue";
 import { Text } from "@/components/Barrage/types";
+import { getBulltes } from "@/components/Barrage/model";
 
 let uid = 0;
 
 export default defineComponent({
   components: { Barrage },
   data: () => ({
-    area: "small",
+    area: "half",
   }),
   setup() {
     const textViewRef = ref<InstanceType<typeof Barrage>>();
     const inputRef = ref();
+    const total = ref();
 
     const send = () => {
       const randomData: Text = {
@@ -48,10 +54,16 @@ export default defineComponent({
       inputRef.value.focus();
     };
 
+    const add = () => {
+      textViewRef.value?.add(getBulltes(total.value));
+    };
+
     return {
       textViewRef,
       inputRef,
+      total,
       send,
+      add,
     };
   },
 });
