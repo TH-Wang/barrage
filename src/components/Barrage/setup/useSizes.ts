@@ -5,6 +5,7 @@ import {
   Size,
   AREA_ENUM,
   RENDER_STATUS_ENUM,
+  RenderStatus,
 } from "../types";
 
 type UseSizes = (
@@ -24,9 +25,11 @@ type ComputeRows = (
   trackHeight: number
 ) => number;
 
-let render_status = RENDER_STATUS_ENUM.PENDING;
+let render_status: RenderStatus = RENDER_STATUS_ENUM.PENDING;
 
-export const getRenderStatus = () => render_status;
+export function getRenderStatus(): RenderStatus {
+  return render_status;
+}
 
 // 计算轨道数量
 const computeRows: ComputeRows = (area, containerSize, trackHeight) => {
