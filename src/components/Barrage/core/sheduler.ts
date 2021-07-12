@@ -1,5 +1,6 @@
-import { Bullet, TrackHandlers, RENDER_STATUS_ENUM } from "../types";
+import { Bullet, Tracks, TrackHandlers, RENDER_STATUS_ENUM } from "../types";
 import { getRenderStatus } from "../setup/useSizes";
+import isChildrenEmpty from "../utils/is-children-empty";
 
 // 等待队列（用于处理数据已经到达，但页面未完成渲染的情况）
 const waitQueue: Array<Bullet> = [];
@@ -40,7 +41,10 @@ export const pushQueue = (bullet: Bullet | Bullet[]): void => {
 
 export const getQueue = () => queue;
 
-export default function sheduler({ pushTracks, cleanupTracks }: TrackHandlers) {
+export default function sheduler(
+  tracks: Tracks,
+  { pushTracks, cleanupTracks }: TrackHandlers
+) {
   // timeout return a number
   let worker: number | undefined = undefined;
 
@@ -51,7 +55,7 @@ export default function sheduler({ pushTracks, cleanupTracks }: TrackHandlers) {
       pushTracks();
       cleanupTracks();
 
-      if (!queue.length) {
+      if (isChildrenEmpty(tracks)) {
         clearTimeout(worker);
         worker = undefined;
       } else {

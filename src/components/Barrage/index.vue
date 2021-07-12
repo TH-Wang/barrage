@@ -79,7 +79,7 @@ export default defineComponent({
     };
 
     const { pushTracks, cleanupTracks }: TrackHandlers = initTrackHandlers();
-    sheduler({ pushTracks, cleanupTracks });
+    sheduler(tracks.value, { pushTracks, cleanupTracks });
 
     onMounted(() => {
       getSizes();
