@@ -10,6 +10,6 @@ export function last<T>(target: Array<T>): T | undefined {
 }
 
 // 判断所有子数组是否都为空
-export function isChildrenEmpty(array: Array<any>): boolean {
-  return array.some((item) => !item.length);
+export function isEveryEmpty(array: Array<any>): boolean {
+  return array.every((item) => !item.length);
 }

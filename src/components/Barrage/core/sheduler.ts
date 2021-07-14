@@ -1,7 +1,7 @@
 import Bullet from "./bullet";
 import { TrackHandlers, RENDER_STATUS_ENUM } from "../types";
 import { getRenderStatus } from "../setup/useSizes";
-import { isChildrenEmpty } from "../utils/array";
+import { isEveryEmpty } from "../utils/array";
 
 // 等待队列（用于处理数据已经到达，但页面未完成渲染的情况）
 const waitQueue: Array<Bullet> = [];
@@ -54,7 +54,7 @@ export default function sheduler({ getTracks, pushTracks }: TrackHandlers) {
 
       const tracks = getTracks();
 
-      if (isChildrenEmpty(tracks)) {
+      if (isEveryEmpty(tracks)) {
         clearTimeout(worker);
         worker = undefined;
       } else {
