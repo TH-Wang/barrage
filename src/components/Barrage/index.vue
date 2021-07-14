@@ -8,11 +8,11 @@
     >
       <div
         v-for="bullet in track"
-        :key="bullet.data.id"
+        :key="bullet.id"
         class="text"
         v-load="{ onLoad: onBulletLoad, payload: bullet }"
       >
-        {{ bullet.data.value }}
+        {{ bullet.value }}
       </div>
     </div>
   </div>
@@ -24,10 +24,10 @@ import useSizes from "./setup/useSizes";
 import useTracks from "./setup/useTracks";
 import animate from "./core/animate";
 import sheduler, { pushQueue } from "./core/sheduler";
+import Bullet from "./core/bullet";
 import { getBulltes } from "./model/index";
 import {
-  Text,
-  Bullet,
+  OriginBullet,
   FontSizePropType,
   AreaPropType,
   AREA_ENUM,
@@ -68,23 +68,30 @@ export default defineComponent({
       area
     );
 
-    const { tracks, getTracks, pushTracks, cleanupTracks } = useTracks(rows);
+    const { tracks, getTracks, pushTracks } = useTracks(rows);
 
     const onBulletLoad = (el: Element, bullet: Bullet) => {
-      animate(el, bullet, outerSize.width);
+      bullet.el = el;
+      animate(bullet, outerSize);
     };
 
-    const add = (text: Text | Text[]) => {
-      if (Array.isArray(text)) {
-        pushQueue(text.map((item) => ({ data: item, animate: null })));
-      } else pushQueue({ data: text, animate: null });
+    const push = (data: OriginBullet | OriginBullet[]) => {
+      if (Array.isArray(data)) {
+        const bullets: Bullet[] = data.map(
+          (item: OriginBullet) => new Bullet(item.id, item.value, item.data)
+        );
+        pushQueue(bullets);
+      } else {
+        const bullet = new Bullet(data.id, data.value, data.data);
+        pushQueue(bullet);
+      }
     };
 
-    sheduler({ getTracks, pushTracks, cleanupTracks });
+    sheduler({ getTracks, pushTracks });
 
     onMounted(() => {
       initOuterSize();
-      add(getBulltes());
+      push(getBulltes());
     });
 
     return {
@@ -100,7 +107,7 @@ export default defineComponent({
       onBulletLoad,
 
       // exposed apis
-      add,
+      push,
     };
   },
 });

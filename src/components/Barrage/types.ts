@@ -1,4 +1,4 @@
-import { Ref } from "vue";
+import Bullet from "./core/bullet";
 
 /**
  * Props types
@@ -24,18 +24,14 @@ export interface Size {
   height: number;
 }
 
-export interface Text {
+export interface OriginBullet {
   id: string | number;
   value: string | number;
+  data?: any;
 }
 
 export interface AnimationWithCustomParams extends Animation {
   appeard?: boolean;
-}
-
-export interface Bullet {
-  data: Text;
-  animate: AnimationWithCustomParams | null;
 }
 
 export type Tracks = Array<Bullet[]>;
@@ -43,7 +39,6 @@ export type Tracks = Array<Bullet[]>;
 export interface TrackHandlers {
   getTracks: () => Tracks;
   pushTracks: () => void;
-  cleanupTracks: () => void;
 }
 
 export enum RENDER_STATUS_ENUM {

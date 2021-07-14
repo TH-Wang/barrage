@@ -21,7 +21,7 @@
     </div>
     <div>
       <input type="text" v-model="total" />条
-      <button @click="add">发送</button>
+      <button @click="sendRandom">发送</button>
     </div>
   </div>
 </template>
@@ -29,7 +29,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import Barrage from "@/components/Barrage/index.vue";
-import { Text } from "@/components/Barrage/types";
+import { OriginBullet } from "@/components/Barrage/types";
 import { getBulltes } from "@/components/Barrage/model";
 
 let uid = 0;
@@ -45,17 +45,17 @@ export default defineComponent({
     const total = ref();
 
     const send = () => {
-      const randomData: Text = {
+      const randomData: OriginBullet = {
         id: uid++,
         value: inputRef.value.value,
       };
-      textViewRef.value?.add(randomData);
+      textViewRef.value?.push(randomData);
       inputRef.value.value = "";
       inputRef.value.focus();
     };
 
-    const add = () => {
-      textViewRef.value?.add(getBulltes(total.value));
+    const sendRandom = () => {
+      textViewRef.value?.push(getBulltes(total.value));
     };
 
     return {
@@ -63,7 +63,7 @@ export default defineComponent({
       inputRef,
       total,
       send,
-      add,
+      sendRandom,
     };
   },
 });

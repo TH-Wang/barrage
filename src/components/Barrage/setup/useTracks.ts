@@ -1,6 +1,8 @@
 import { reactive, Ref, watch } from "vue";
+import Bullet from "../core/bullet";
 import { getQueue } from "../core/sheduler";
-import { Tracks, Bullet, TrackHandlers } from "../types";
+import { head, last } from "../utils/array";
+import { Tracks, TrackHandlers } from "../types";
 
 interface UseTracksResults extends TrackHandlers {
   tracks: Tracks;
@@ -16,6 +18,25 @@ const initTracks = (count: number): Tracks => {
   return initTrack;
 };
 
+// 从轨道中清理已经完成动画的弹幕
+const cleanup = (id: string | number, tracks: Tracks) => {
+  const len = tracks.length;
+  for (let i = 0; i < len; i++) {
+    const track: Array<Bullet> = tracks[i];
+    if (!track.length) continue;
+    for (let j = 0; j < track.length; j++) {
+      const bullet = track[j];
+      if (bullet.id === id && bullet.animation?.playState === "finished") {
+        track.splice(j, 1);
+        break;
+      }
+    }
+  }
+};
+
+// 调用该方法，通过传入的 id 参数，在轨道中的删除弹幕
+export let cleanupBulletInTracks: (id: string | number) => void = () => void 0;
+
 const useTracks: UseTracks = (rows) => {
   const initTrack: Tracks = initTracks(rows.value);
   const tracks = reactive<Tracks>(initTrack);
@@ -29,29 +50,17 @@ const useTracks: UseTracks = (rows) => {
   const pushTracks = () => {
     for (let i = 0; i < rows.value; i++) {
       const track: Array<Bullet> = tracks[i];
-      if (
-        !track.length ||
-        (track[track.length - 1] as Bullet)?.animate?.appeard
-      ) {
-        const willPushBullet: Bullet | undefined = getQueue().shift();
-        if (willPushBullet) track.push(willPushBullet);
+      if (!track.length || last<Bullet>(track)?.appeard) {
+        const headBullet: Bullet | undefined = head<Bullet>(getQueue());
+        if (headBullet) track.push(headBullet);
         break;
       }
     }
   };
 
-  // 清理不需要并且已空闲的弹幕轨道
-  const cleanupTracks = () => {
-    const len = tracks.length;
-    for (let i = 0; i < len; i++) {
-      const track: Array<Bullet> = tracks[i];
-      if (!track.length) continue;
-      for (let j = 0; j < track.length; j++) {
-        const bullet = track[j];
-        if (bullet.animate?.playState === "finished") track.shift();
-        else break;
-      }
-    }
+  // 初始化清理弹幕函数
+  cleanupBulletInTracks = (id: number | string) => {
+    cleanup(id, tracks);
   };
 
   // 观察rows的变化，如果轨道数量不足则立即添加
@@ -69,7 +78,7 @@ const useTracks: UseTracks = (rows) => {
     { immediate: true }
   );
 
-  return { tracks, getTracks, pushTracks, cleanupTracks };
+  return { tracks, getTracks, pushTracks };
 };
 
 export default useTracks;

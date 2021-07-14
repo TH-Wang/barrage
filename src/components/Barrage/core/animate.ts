@@ -1,4 +1,5 @@
-import { Bullet } from "../types";
+import Bullet from "../core/bullet";
+import { Size } from "../types";
 
 type InitParams = (
   el: Element,
@@ -7,7 +8,7 @@ type InitParams = (
 
 type InvokeAnimate = (el: Element, s: number, t: number) => Animation;
 
-type Animate = (el: Element, bullet: Bullet, outerWidth: number) => void;
+type Animate = (bullet: Bullet, outerSize: Size) => void;
 
 // 速度(100px/s)
 const SPEED = 100;
@@ -45,15 +46,14 @@ const invokeAnimate: InvokeAnimate = (el, s, t) => {
   return el.animate(keyframes, options);
 };
 
-const animate: Animate = (el, bullet, outerWidth) => {
-  const { s, t, appeardTime } = initParams(el, outerWidth);
+const animate: Animate = (bullet, outerSize) => {
+  const { s, t, appeardTime } = initParams(
+    bullet.el as Element,
+    outerSize.width
+  );
   // 执行动画，获取动画信息对象
-  const animation: Animation = invokeAnimate(el, s, t);
-  // 挂载属性
-  bullet.animate = animation;
-  Object.defineProperty(bullet.animate, "appeard", {
-    get: () => (animation.currentTime as number) >= appeardTime,
-  });
+  const animation: Animation = invokeAnimate(bullet.el as Element, s, t);
+  bullet.animation = animation;
 };
 
 export default animate;

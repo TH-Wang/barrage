@@ -1,6 +1,7 @@
-import { Bullet, TrackHandlers, RENDER_STATUS_ENUM } from "../types";
+import Bullet from "./bullet";
+import { TrackHandlers, RENDER_STATUS_ENUM } from "../types";
 import { getRenderStatus } from "../setup/useSizes";
-import isChildrenEmpty from "../utils/is-children-empty";
+import { isChildrenEmpty } from "../utils/array";
 
 // 等待队列（用于处理数据已经到达，但页面未完成渲染的情况）
 const waitQueue: Array<Bullet> = [];
@@ -12,7 +13,7 @@ const queue: Array<Bullet> = [];
 type Executor = (() => void) | null;
 let executor: Executor = null;
 
-const push = (target: Array<Bullet>, bullets: Bullet | Bullet[]) => {
+const pushTarget = (target: Array<Bullet>, bullets: Bullet | Bullet[]) => {
   if (Array.isArray(bullets)) target.push(...bullets);
   else target.push(bullets);
 };
@@ -21,19 +22,19 @@ const push = (target: Array<Bullet>, bullets: Bullet | Bullet[]) => {
 export const pushQueue = (bullet: Bullet | Bullet[]): void => {
   // 如果还没有渲染完成，就先存放到等待队列中
   if (getRenderStatus() !== RENDER_STATUS_ENUM.DONE) {
-    push(waitQueue, bullet);
+    pushTarget(waitQueue, bullet);
     return;
   }
 
   // 如果等待队列中有数据，则全部推送到缓冲队列中
   if (waitQueue.length) {
-    push(queue, waitQueue);
+    pushTarget(queue, waitQueue);
     // 清空等待队列
     waitQueue.length = 0;
   }
 
   // 推送弹幕，一个或多个
-  push(queue, bullet);
+  pushTarget(queue, bullet);
 
   // 执行器
   if (executor) executor();
@@ -41,11 +42,7 @@ export const pushQueue = (bullet: Bullet | Bullet[]): void => {
 
 export const getQueue = () => queue;
 
-export default function sheduler({
-  getTracks,
-  pushTracks,
-  cleanupTracks,
-}: TrackHandlers) {
+export default function sheduler({ getTracks, pushTracks }: TrackHandlers) {
   // timeout return a number
   let worker: number | undefined = undefined;
 
@@ -54,8 +51,9 @@ export default function sheduler({
 
     worker = setTimeout(() => {
       pushTracks();
-      cleanupTracks();
+
       const tracks = getTracks();
+
       if (isChildrenEmpty(tracks)) {
         clearTimeout(worker);
         worker = undefined;

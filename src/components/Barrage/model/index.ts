@@ -1,10 +1,10 @@
 import Mock from "mockjs";
-import { Text } from "../types";
+import { OriginBullet } from "../types";
 
 const Random = Mock.Random;
 
-export function getBulltes(total = 10): Array<Text> {
-  const res: Array<Text> = [];
+export function getBulltes(total = 10): Array<OriginBullet> {
+  const res: Array<OriginBullet> = [];
   for (let i = 0; i < total; i++) {
     res.push({
       id: Random.guid(),
