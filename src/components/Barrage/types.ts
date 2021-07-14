@@ -40,10 +40,8 @@ export interface Bullet {
 
 export type Tracks = Array<Bullet[]>;
 
-export type PushTracks = (tracks: Ref<Tracks>, rows: Ref<number>) => void;
-export type CleanupTracks = (tracks: Ref<Tracks>) => void;
-
 export interface TrackHandlers {
+  getTracks: () => Tracks;
   pushTracks: () => void;
   cleanupTracks: () => void;
 }

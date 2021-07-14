@@ -1,4 +1,4 @@
-import { Bullet, Tracks, TrackHandlers, RENDER_STATUS_ENUM } from "../types";
+import { Bullet, TrackHandlers, RENDER_STATUS_ENUM } from "../types";
 import { getRenderStatus } from "../setup/useSizes";
 import isChildrenEmpty from "../utils/is-children-empty";
 
@@ -41,10 +41,11 @@ export const pushQueue = (bullet: Bullet | Bullet[]): void => {
 
 export const getQueue = () => queue;
 
-export default function sheduler(
-  tracks: Tracks,
-  { pushTracks, cleanupTracks }: TrackHandlers
-) {
+export default function sheduler({
+  getTracks,
+  pushTracks,
+  cleanupTracks,
+}: TrackHandlers) {
   // timeout return a number
   let worker: number | undefined = undefined;
 
@@ -54,7 +55,7 @@ export default function sheduler(
     worker = setTimeout(() => {
       pushTracks();
       cleanupTracks();
-
+      const tracks = getTracks();
       if (isChildrenEmpty(tracks)) {
         clearTimeout(worker);
         worker = undefined;

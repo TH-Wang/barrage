@@ -31,7 +31,6 @@ import {
   FontSizePropType,
   AreaPropType,
   AREA_ENUM,
-  TrackHandlers,
 } from "./types";
 
 export default defineComponent({
@@ -66,7 +65,7 @@ export default defineComponent({
     const { containerSize, containerRef, rows, trackViewHeight, getSizes } =
       useSizes(fontSize, area);
 
-    const { tracks, initTrackHandlers } = useTracks(rows);
+    const { tracks, getTracks, pushTracks, cleanupTracks } = useTracks(rows);
 
     const elementLoad = (el: Element, bullet: Bullet) => {
       animate(el, bullet, containerSize.width);
@@ -78,8 +77,7 @@ export default defineComponent({
       } else pushQueue({ data: text, animate: null });
     };
 
-    const { pushTracks, cleanupTracks }: TrackHandlers = initTrackHandlers();
-    sheduler(tracks.value, { pushTracks, cleanupTracks });
+    sheduler({ getTracks, pushTracks, cleanupTracks });
 
     onMounted(() => {
       getSizes();
