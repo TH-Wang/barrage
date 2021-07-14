@@ -1,8 +1,8 @@
 <template>
-  <div class="text-view" ref="containerRef">
+  <div class="text-view" ref="outerRef">
     <div
       class="track"
-      :style="{ height: trackViewHeight + 'px' }"
+      :style="{ height: trackStyles + 'px' }"
       v-for="(track, idx) in tracks"
       :key="idx"
     >
@@ -10,7 +10,7 @@
         v-for="bullet in track"
         :key="bullet.data.id"
         class="text"
-        v-load="{ listener: elementLoad, payload: bullet }"
+        v-load="{ onLoad: onBulletLoad, payload: bullet }"
       >
         {{ bullet.data.value }}
       </div>
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, PropType, toRefs } from "vue";
+import { defineComponent, onMounted, PropType, toRefs } from "vue";
 import useSizes from "./setup/useSizes";
 import useTracks from "./setup/useTracks";
 import animate from "./core/animate";
@@ -55,20 +55,23 @@ export default defineComponent({
   directives: {
     load: {
       mounted(e, { value }) {
-        nextTick(value.listener(e, value.payload));
+        const { onLoad, payload } = value;
+        onLoad(e, payload);
       },
     },
   },
   setup(props) {
     const { fontSize, area } = toRefs(props);
 
-    const { containerSize, containerRef, rows, trackViewHeight, getSizes } =
-      useSizes(fontSize, area);
+    const { outerSize, outerRef, rows, trackStyles, initOuterSize } = useSizes(
+      fontSize,
+      area
+    );
 
     const { tracks, getTracks, pushTracks, cleanupTracks } = useTracks(rows);
 
-    const elementLoad = (el: Element, bullet: Bullet) => {
-      animate(el, bullet, containerSize.width);
+    const onBulletLoad = (el: Element, bullet: Bullet) => {
+      animate(el, bullet, outerSize.width);
     };
 
     const add = (text: Text | Text[]) => {
@@ -80,21 +83,21 @@ export default defineComponent({
     sheduler({ getTracks, pushTracks, cleanupTracks });
 
     onMounted(() => {
-      getSizes();
+      initOuterSize();
       add(getBulltes());
     });
 
     return {
       // refs
-      containerSize,
-      containerRef,
+      outerSize,
+      outerRef,
       tracks,
 
       // computed
-      trackViewHeight,
+      trackStyles,
 
       // methods
-      elementLoad,
+      onBulletLoad,
 
       // exposed apis
       add,

@@ -12,16 +12,16 @@ type UseSizes = (
   fontSize: Ref<FontSizePropType>,
   area: Ref<AreaPropType>
 ) => {
-  containerRef: Ref<Element>;
-  containerSize: Size;
+  outerRef: Ref<Element>;
+  outerSize: Size;
   rows: Ref<number>;
-  trackViewHeight: ComputedRef<number>;
-  getSizes: () => void;
+  trackStyles: ComputedRef<number>;
+  initOuterSize: () => void;
 };
 
 type ComputeRows = (
   area: AreaPropType,
-  containerSize: Size,
+  outerSize: Size,
   trackHeight: number
 ) => number;
 
@@ -32,8 +32,8 @@ export function getRenderStatus(): RenderStatus {
 }
 
 // 计算轨道数量
-const computeRows: ComputeRows = (area, containerSize, trackHeight) => {
-  const { height } = containerSize;
+const computeRows: ComputeRows = (area, outerSize, trackHeight) => {
+  const { height } = outerSize;
   const total: number = Math.floor(height / trackHeight);
 
   const areaToRows = {
@@ -47,13 +47,13 @@ const computeRows: ComputeRows = (area, containerSize, trackHeight) => {
 };
 
 const useSizes: UseSizes = (fontSize, area) => {
-  const containerRef = ref();
-  const containerSize = reactive<Size>({ width: 0, height: 0 });
+  const outerRef = ref();
+  const outerSize = reactive<Size>({ width: 0, height: 0 });
 
   const rows = ref<number>(0);
 
   // 轨道显示高度
-  const trackViewHeight = computed((): number => {
+  const trackStyles = computed((): number => {
     if (typeof fontSize.value === "number") return fontSize.value + 4;
     else if (typeof fontSize.value === "string")
       return parseInt(fontSize.value.slice(0, -2)) + 4;
@@ -61,32 +61,31 @@ const useSizes: UseSizes = (fontSize, area) => {
   });
 
   // 获取所需尺寸
-  const getSizes = () => {
+  const initOuterSize = () => {
     // 父容器尺寸
-    containerSize.width = containerRef.value.getBoundingClientRect().width;
-    containerSize.height =
-      containerRef.value.parentNode.getBoundingClientRect().height;
+    outerSize.width = outerRef.value.getBoundingClientRect().width;
+    outerSize.height = outerRef.value.parentNode.getBoundingClientRect().height;
 
     // 轨道数量
-    rows.value = computeRows(area.value, containerSize, trackViewHeight.value);
+    rows.value = computeRows(area.value, outerSize, trackStyles.value);
 
     // 改变渲染状态 -> done
     render_status = RENDER_STATUS_ENUM.DONE;
   };
 
   watch(
-    [area, containerSize],
+    [area, outerSize],
     ([areaValue, containerSizeValue]) => {
       rows.value = computeRows(
         areaValue,
         containerSizeValue,
-        trackViewHeight.value
+        trackStyles.value
       );
     },
     { immediate: true }
   );
 
-  return { containerRef, containerSize, rows, trackViewHeight, getSizes };
+  return { outerRef, outerSize, rows, trackStyles, initOuterSize };
 };
 
 export default useSizes;
